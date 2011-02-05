@@ -1,0 +1,62 @@
+NAME
+    Dist::Zilla::PluginBundle::NIGELM - Build your distributions like FLORA
+    does with NIGELM tweaks
+
+SYNOPSIS
+    In dist.ini:
+
+      [@NIGELM]
+      dist = Distribution-Name
+      repository_at = github
+
+DESCRIPTION
+    This is the Dist::Zilla configuration I use to build my distributions.
+    It is strongly based on the @FLORA bundle, and extends that bundle (so
+    if that bundle is changed incompatibly I get to keep both pieces)
+
+    It is roughly equivalent to:
+
+      [@Filter]
+      bundle = @Basic
+      remove = Readme
+
+      [MetaConfig]
+      [MetaJSON]
+      [PkgVersion]
+      [PodSyntaxTests]
+      [NoTabsTests]
+      [EOLTests]
+      [ReadmeFromPod]
+      [PodCoverageTests]
+
+      [MetaResources]
+      repository.type   = git
+      repository.url    = git://github.com/nigelm/${lowercase_dist}
+      repository.web    = http://github.com/nigelm/${lowercase_dist}
+      bugtracker.web    = http://rt.cpan.org/Public/Dist/Display.html?Name=${dist}
+      bugtracker.mailto = bug-${dist}@rt.cpan.org
+      homepage          = http://search.cpan.org/dist/${dist}
+
+      [Authority]
+      authority   = cpan:NIGELM
+      do_metadata = 1
+
+      [@Git]
+
+      [PodWeaver]
+      config_plugin = @FLORA
+
+      [AutoPrereqs]
+
+    If "no_cpan" or the environment variable "NO_CPAN" is set, then the
+    upload to CPAN is suppressed.
+
+AUTHOR
+    Nigel Metheringham <nigelm@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Nigel Metheringham.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
