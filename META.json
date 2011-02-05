@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Dist::Zilla::Plugin::AutoPrereqs" : 0,
             "Dist::Zilla::Plugin::FakeRelease" : 0,
             "Dist::Zilla::Plugin::ReadmeFromPod" : 0,
             "Dist::Zilla::PluginBundle::FLORA" : "0.13",
@@ -56,7 +57,7 @@
          "web" : "http://github.com/rafl/Dist-Zilla-PluginBundle-FLORA"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_Dist_Zilla" : {
       "plugins" : [
          {
@@ -200,13 +201,18 @@
             "version" : "1.110330"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "name" : "@NIGELM/Git::NextVersion",
+            "version" : "1.110330"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
             "name" : "@NIGELM/PodWeaver",
             "version" : "3.101641"
          },
          {
-            "class" : "Dist::Zilla::Plugin::AutoPrereq",
-            "name" : "@NIGELM/AutoPrereq",
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@NIGELM/AutoPrereqs",
             "version" : "4.200002"
          },
          {

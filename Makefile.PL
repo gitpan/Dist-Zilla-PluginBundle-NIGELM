@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
   'LICENSE' => 'perl',
   'NAME' => 'Dist::Zilla::PluginBundle::NIGELM',
   'PREREQ_PM' => {
+    'Dist::Zilla::Plugin::AutoPrereqs' => '0',
     'Dist::Zilla::Plugin::FakeRelease' => '0',
     'Dist::Zilla::Plugin::ReadmeFromPod' => '0',
     'Dist::Zilla::PluginBundle::FLORA' => '0.13',
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     'MooseX::Types::URI' => '0',
     'namespace::autoclean' => '0'
   },
-  'VERSION' => '0.02',
+  'VERSION' => '0.03',
   'test' => {
     'TESTS' => 't/*.t'
   }

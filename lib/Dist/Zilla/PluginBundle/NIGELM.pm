@@ -3,7 +3,7 @@ BEGIN {
   $Dist::Zilla::PluginBundle::NIGELM::AUTHORITY = 'cpan:NIGELM';
 }
 BEGIN {
-  $Dist::Zilla::PluginBundle::NIGELM::VERSION = '0.02';
+  $Dist::Zilla::PluginBundle::NIGELM::VERSION = '0.03';
 }
 
 # ABSTRACT: Build your distributions like FLORA does with NIGELM tweaks
@@ -36,6 +36,25 @@ has tag_message => (
     is      => 'ro',
     isa     => Str,
     default => 'Release of %v',
+);
+
+has version_regexp => (
+    is      => 'ro',
+    isa     => Str,
+    lazy    => 1,
+    builder => '_build_version_regexp',
+);
+
+method _build_version_regexp {
+    my $version_regexp = $self->tag_format;
+    $version_regexp =~ s/\%v/\(\.\+\)/;
+    return sprintf( '^%s$', $version_regexp );
+}
+
+has git_autoversion => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1,
 );
 
 # if set, trigger FakeRelease instead of UploadToCPAN
@@ -101,11 +120,20 @@ method configure {
         }
     );
 
+    $self->add_plugins(
+        [
+            'Git::NextVersion' => {
+                first_version  => '0.01',
+                version_regexp => $self->version_regexp,
+            }
+        ]
+    ) if ( $self->git_autoversion );
+
     $self->is_task
       ? $self->add_plugins('TaskWeaver')
       : $self->add_plugins( [ PodWeaver => { config_plugin => $self->weaver_config_plugin, } ], );
 
-    $self->add_plugins('AutoPrereq') if $self->auto_prereq;
+    $self->add_plugins('AutoPrereqs') if $self->auto_prereq;
 }
 
 __PACKAGE__->meta->make_immutable;
