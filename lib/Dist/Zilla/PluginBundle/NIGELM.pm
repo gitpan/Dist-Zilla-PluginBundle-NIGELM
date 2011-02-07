@@ -3,7 +3,7 @@ BEGIN {
   $Dist::Zilla::PluginBundle::NIGELM::AUTHORITY = 'cpan:NIGELM';
 }
 BEGIN {
-  $Dist::Zilla::PluginBundle::NIGELM::VERSION = '0.03';
+  $Dist::Zilla::PluginBundle::NIGELM::VERSION = '0.04';
 }
 
 # ABSTRACT: Build your distributions like FLORA does with NIGELM tweaks
@@ -24,6 +24,12 @@ has authority => (
     is      => 'ro',
     isa     => Str,
     default => 'cpan:NIGELM',
+);
+
+has github_user => (
+    is      => 'ro',
+    isa     => Str,
+    default => 'nigelm',
 );
 
 has tag_format => (
@@ -198,8 +204,23 @@ It is roughly equivalent to:
 
   [AutoPrereqs]
 
+=head2 Tweakables
+
+=head3 authority
+
+The authority for this distro - defaults to C<cpan:NIGELM>
+
+=head3 no_cpan
+
 If C<no_cpan> or the environment variable C<NO_CPAN> is set, then
 the upload to CPAN is suppressed.
+
+=head3 tag_format / tag_message / version_regexp / git_autoversion
+
+Overrides the Git bundle defaults for these. By default I use an
+unusual tag format of C<release/%v> for historical reasons. If
+git_autoversion is true (the default) then versioning is taken from
+git.
 
 =head1 AUTHOR
 

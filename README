@@ -48,8 +48,18 @@ DESCRIPTION
 
       [AutoPrereqs]
 
+  Tweakables
+   authority
+    The authority for this distro - defaults to "cpan:NIGELM"
+
+   no_cpan
     If "no_cpan" or the environment variable "NO_CPAN" is set, then the
     upload to CPAN is suppressed.
+
+   tag_format / tag_message / version_regexp / git_autoversion
+    Overrides the Git bundle defaults for these. By default I use an unusual
+    tag format of "release/%v" for historical reasons. If git_autoversion is
+    true (the default) then versioning is taken from git.
 
 AUTHOR
     Nigel Metheringham <nigelm@cpan.org>

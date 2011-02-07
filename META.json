@@ -47,17 +47,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Dist-Zilla-PluginBundle-FLORA@rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-FLORA"
+         "mailto" : "bug-Dist-Zilla-PluginBundle-NIGELM@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-NIGELM"
       },
-      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-PluginBundle-FLORA",
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-PluginBundle-NIGELM",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/rafl/Dist-Zilla-PluginBundle-FLORA.git",
-         "web" : "http://github.com/rafl/Dist-Zilla-PluginBundle-FLORA"
+         "url" : "git://github.com/nigelm/Dist-Zilla-PluginBundle-NIGELM.git",
+         "web" : "http://github.com/nigelm/Dist-Zilla-PluginBundle-NIGELM"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_Dist_Zilla" : {
       "plugins" : [
          {
