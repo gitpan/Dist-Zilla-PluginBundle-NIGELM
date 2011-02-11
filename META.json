@@ -25,6 +25,7 @@
             "Dist::Zilla::Plugin::AutoPrereqs" : 0,
             "Dist::Zilla::Plugin::CheckChangeLog" : 0,
             "Dist::Zilla::Plugin::CompileTests" : 0,
+            "Dist::Zilla::Plugin::CopyReadmeFromBuild" : 0,
             "Dist::Zilla::Plugin::CriticTests" : 0,
             "Dist::Zilla::Plugin::DistManifestTests" : 0,
             "Dist::Zilla::Plugin::EOLTests" : 0,
@@ -105,7 +106,7 @@
          "web" : "http://github.com/nigelm/Dist-Zilla-PluginBundle-NIGELM"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_Dist_Zilla" : {
       "plugins" : [
          {
@@ -187,11 +188,6 @@
             "class" : "Dist::Zilla::Plugin::UnusedVarsTests",
             "name" : "@NIGELM/UnusedVarsTests",
             "version" : "1.100860"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::NoTabsTests",
-            "name" : "@NIGELM/NoTabsTests",
-            "version" : "0.01"
          },
          {
             "class" : "Dist::Zilla::Plugin::EOLTests",
@@ -306,6 +302,11 @@
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
             "name" : "@NIGELM/Git::Tag",
+            "version" : "1.110330"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
+            "name" : "@NIGELM/Git::CommitBuild",
             "version" : "1.110330"
          },
          {

@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::NIGELM;
 BEGIN {
-  $Dist::Zilla::PluginBundle::NIGELM::VERSION = '0.05';
+  $Dist::Zilla::PluginBundle::NIGELM::VERSION = '0.06';
 }
 BEGIN {
   $Dist::Zilla::PluginBundle::NIGELM::AUTHORITY = 'cpan:NIGELM';
@@ -15,6 +15,7 @@ use MooseX::Types::URI qw(Uri);
 use MooseX::Types::Email qw(EmailAddress);
 use MooseX::Types::Moose qw(Bool Str CodeRef);
 use MooseX::Types::Structured 0.20 qw(Map Dict Optional);
+use MooseX::Types::Moose qw{ ArrayRef Str };
 use namespace::autoclean -also => 'lower';
 
 # these are all the modules used, listed purely for the dep generator
@@ -22,6 +23,7 @@ use Dist::Zilla::Plugin::Authority;
 use Dist::Zilla::Plugin::AutoPrereqs;
 use Dist::Zilla::Plugin::CheckChangeLog;
 use Dist::Zilla::Plugin::CompileTests;
+use Dist::Zilla::Plugin::CopyReadmeFromBuild;
 use Dist::Zilla::Plugin::CriticTests;
 use Dist::Zilla::Plugin::DistManifestTests;
 use Dist::Zilla::Plugin::EOLTests;
@@ -94,8 +96,8 @@ has auto_prereqs => (
 );
 
 has skip_prereqs => (
-    is      => 'ro',
-    isa     => Str,
+    is  => 'ro',
+    isa => Str,
 );
 
 has is_task => (
@@ -105,7 +107,7 @@ has is_task => (
     builder => '_build_is_task',
 );
 
-method _build_is_task {
+method _build_is_task () {
     return $self->dist =~ /^Task-/ ? 1 : 0;
 }
 
@@ -127,6 +129,12 @@ has disable_trailing_whitespace_tests => (
     default => 0,
 );
 
+has disable_no_tabs_tests => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0,
+);
+
 has bugtracker_url => (
     isa     => Uri,
     coerce  => 1,
@@ -135,7 +143,7 @@ has bugtracker_url => (
     handles => { bugtracker_url => 'as_string', },
 );
 
-method _build_bugtracker_url {
+method _build_bugtracker_url () {
     return sprintf $self->_rt_uri_pattern, $self->dist;
 }
 
@@ -146,7 +154,7 @@ has bugtracker_email => (
     builder => '_build_bugtracker_email',
 );
 
-method _build_bugtracker_email {
+method _build_bugtracker_email () {
     return sprintf 'bug-%s@rt.cpan.org', $self->dist;
 }
 
@@ -164,7 +172,7 @@ has homepage_url => (
     handles => { homepage_url => 'as_string', },
 );
 
-method _build_homepage_url {
+method _build_homepage_url () {
     return sprintf $self->_cpansearch_pattern, $self->dist;
 }
 
@@ -216,7 +224,7 @@ has version_regexp => (
     builder => '_build_version_regexp',
 );
 
-method _build_version_regexp {
+method _build_version_regexp () {
     my $version_regexp = $self->tag_format;
     $version_regexp =~ s/\%v/\(\.\+\)/;
     return sprintf( '^%s$', $version_regexp );
@@ -235,6 +243,20 @@ has no_cpan => (
     lazy    => 1,
     default => sub { $ENV{NO_CPAN} || $_[0]->payload->{no_cpan} || 0 }
 );
+
+# git allow dirty references
+has git_allow_dirty => (
+    is      => 'ro',
+    lazy    => 1,
+    isa     => ArrayRef [Str],
+    builder => '_build_git_allow_dirty',
+);
+
+has changelog => ( is => 'ro', isa => Str, default => 'Changes' );
+
+sub mvp_multivalue_args { return ('git_allow_dirty'); }
+
+sub _build_git_allow_dirty { [ 'dist.ini', shift->changelog, 'README' ] }
 
 my $map_tc = Map [
     Str,
@@ -290,7 +312,7 @@ has _repository_host_map => (
 
 sub lower { lc shift }
 
-method _build__repository_host_map {
+method _build__repository_host_map () {
     my $github_pattern     = sub { sprintf 'git://github.com/%s/%%s.git', $self->github_user };
     my $github_web_pattern = sub { sprintf 'http://github.com/%s/%%s',    $self->github_user };
     my $scsys_web_pattern_proto = sub {
@@ -323,7 +345,7 @@ method _build__repository_host_map {
     };
 }
 
-method _build_repository_url {
+method _build_repository_url () {
     return $self->_resolve_repository_with( $self->repository_at, 'pattern' )
       if $self->has_repository_at;
     confess "Cannot determine repository url without repository_at. " . "Please provide either repository_at or repository.";
@@ -337,33 +359,33 @@ has repository_web => (
     handles => { repository_web => 'as_string', },
 );
 
-method _build_repository_web {
+method _build_repository_web () {
     return $self->_resolve_repository_with( $self->repository_at, 'web_pattern' )
       if $self->has_repository_at;
     confess "Cannot determine repository web url without repository_at. "
       . "Please provide either repository_at or repository_web.";
 }
 
-method _resolve_repository_with( $service, $thing ) {
-    my $dist   = $self->dist;
-      my $data = $self->_repository_data_for($service);
-      confess "unknown repository service $service" unless $data;
+method _resolve_repository_with ( $service, $thing ) {
+    my $dist = $self->dist;
+    my $data = $self->_repository_data_for($service);
+    confess "unknown repository service $service" unless $data;
     return sprintf $data->{$thing}->(),
-    (
+      (
         exists $data->{mangle}
         ? $data->{mangle}->($dist)
         : $dist
-    );
-  }
+      );
+}
 
-  has repository_type => (
+has repository_type => (
     is      => 'ro',
     isa     => Str,
     lazy    => 1,
     builder => '_build_repository_type',
-  );
+);
 
-method _build_repository_type {
+method _build_repository_type () {
     my $data = $self->_repository_data_for( $self->repository_at );
     return $data->{type} if exists $data->{type};
 
@@ -374,12 +396,14 @@ method _build_repository_type {
     confess "Unable to guess repository type based on the repository url. " . "Please provide repository_type.";
 }
 
-override BUILDARGS => method($class:) {
-    my $args = super;
-      return { %{ $args->{payload} }, %{$args} };
+override BUILDARGS => sub {
+    my $class = shift;
+
+    my $args = $class->SUPER::BUILDARGS(@_);
+    return { %{ $args->{payload} }, %{$args} };
 };
 
-method configure {
+method configure () {
 
     # Build a list of all the plugins we want...
     my @wanted = (
@@ -395,27 +419,33 @@ method configure {
               ]
             : ()
         ),
-        [ 'Git::Check' => {} ],
+        [ 'Git::Check' => { allow_dirty => $self->git_allow_dirty } ],
 
         # -- fetch & generate files
-        [ GatherDir           => {} ],
-        [ CompileTests        => { fake_home => $self->fake_home } ],
-        [ CriticTests         => {} ],
-        [ MetaTests           => {} ],
-        [ PodCoverageTests    => {} ],
-        [ PodSyntaxTests      => {} ],
-        [ PodSpellingTests    => {} ],
-        [ KwaliteeTests       => {} ],
+        [ GatherDir    => {} ],
+        [ CompileTests => { fake_home => $self->fake_home } ],
+        [ CriticTests  => {} ],
+        [ MetaTests    => {} ],
+        ( $self->disable_pod_coverage_tests ? () : [ PodCoverageTests => {} ] ),
+        [ PodSyntaxTests   => {} ],
+        [ PodSpellingTests => {} ],
+        (    # Disabling pod coverage scores you a fail on Kwalitee too!
+            $self->disable_pod_coverage_tests ? () : [ KwaliteeTests => {} ]
+        ),
         [ PortabilityTests    => {} ],
         [ SynopsisTests       => {} ],
         [ MinimumVersionTests => {} ],
         [ HasVersionTests     => {} ],
         [ DistManifestTests   => {} ],
         [ UnusedVarsTests     => {} ],
-        [ NoTabsTests         => {} ],
-        [ EOLTests            => { trailing_whitespace => !$self->disable_trailing_whitespace_tests, } ],
-        [ InlineFiles         => {} ],
-        [ ReportVersions      => {} ],
+        (
+            $self->disable_no_tabs_tests
+            ? [ NoTabsTests => {} ]
+            : ()
+        ),
+        [ EOLTests       => { trailing_whitespace => !$self->disable_trailing_whitespace_tests, } ],
+        [ InlineFiles    => {} ],
+        [ ReportVersions => {} ],
 
         # -- remove some files
         [ PruneCruft   => {} ],
@@ -474,15 +504,16 @@ method configure {
         [ Manifest      => {} ],    # should come last
 
         # -- Git release process
-        [ 'Git::Commit' => {} ],
+        ## [ CopyReadmeFromBuild => {} ], # -- unable to get this to work right
+        [ 'Git::Commit' => { allow_dirty => $self->git_allow_dirty } ],
         [
             'Git::Tag' => {
                 tag_format  => $self->tag_format,
                 tag_message => $self->tag_message,
             }
         ],
-        ## [ 'Git::CommitBuild' => {} ],
-        [ 'Git::Push' => {} ],
+        [ 'Git::CommitBuild' => {} ],
+        [ 'Git::Push'        => {} ],
 
         # -- release
         [ CheckChangeLog => {} ],
@@ -510,13 +541,15 @@ __END__
 
 =for stopwords NIGELM Tweakables
 
+=for Pod::Coverage mvp_multivalue_args
+
 =head1 NAME
 
 Dist::Zilla::PluginBundle::NIGELM - Build your distributions like I do
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
